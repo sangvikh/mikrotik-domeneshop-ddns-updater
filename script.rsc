@@ -5,8 +5,11 @@
 #
 #----------MODIFY THIS SECTION AS NEEDED----------------------------------------
 
-# Base64(token:secret)
-:local authBase64 "YOUR_SECRET_HERE"
+# Domeneshop API token
+:local apiToken "YOUR_API_TOKEN"
+
+# Domeneshop API secret
+:local apiSecret "YOUR_API_SECRET"
 
 # Hostname to update (FQDN)
 :local hostname "YOUR_DOMAIN_HERE"
@@ -71,7 +74,8 @@
     :do {
         :set fetchResult [/tool fetch \
             url=$updateUrl \
-            http-header-field=("Authorization: Basic $authBase64") \
+            user=$apiToken \
+            password=$apiSecret \
             output=user as-value]
 
         :set status ($fetchResult->"status")

@@ -10,6 +10,7 @@ The script is designed to run on a main/edge router that receives a public IPv4 
 
 - Uses WAN DHCP as the single source of truth
 - No external IP detection services
+- Uses native RouterOS HTTP Basic Auth
 - Updates DNS only when the IP changes
 - Intended to run on DHCP bind / renew
 - Simple and deterministic behavior
@@ -21,7 +22,7 @@ The script is designed to run on a main/edge router that receives a public IPv4 
 - MikroTik RouterOS v6 or v7
 - Public IPv4 address assigned via DHCP on the WAN interface
 - A Domeneshop account with:
-  - An existing DNS record (A record)
+  - An existing domain
   - An API token and secret
 
 ---
@@ -40,29 +41,7 @@ The script is designed to run on a main/edge router that receives a public IPv4 
 
 ---
 
-## 2. Generate Base64 Credentials
-
-The script uses HTTP Basic Auth.  
-You must Base64-encode `token:secret` once and paste the result into the script.
-
-On Linux/macOS:
-
-```
-echo -n "TOKEN:SECRET" | base64
-```
-
-Example:
-
-```
-echo -n "lsp6k:P0sEcvEsK" | base64
-bHNwNms6UDBzRWN2RXNL
-```
-
-Save the Base64 output — this is what you will use in RouterOS.
-
----
-
-## 3. Add the Script to MikroTik
+## 2. Add the Script to MikroTik
 
 1. Open **System → Scripts**
 2. Create a new script (e.g. `Domeneshop-DDNS`)
@@ -70,8 +49,11 @@ Save the Base64 output — this is what you will use in RouterOS.
 4. Update the following variables:
 
 ```
-# Base64(token:secret)
-:local authBase64 "BASE64(token:secret)"
+# Domeneshop API token
+:local apiToken "YOUR_API_TOKEN"
+
+# Domeneshop API secret
+:local apiSecret "YOUR_API_SECRET"
 
 # Hostname to update (FQDN)
 :local hostname "home.example.com"
@@ -84,7 +66,7 @@ Save the Base64 output — this is what you will use in RouterOS.
 
 ---
 
-## 4. Test the Script Manually
+## 3. Test the Script Manually
 
 Run the script once to verify everything works:
 
@@ -96,12 +78,15 @@ Check **Log** for messages like:
 
 ```
 Domeneshop: IP changed, updating DNS
-Domeneshop: Server response: OK
+Domeneshop: Fetch status = finished
 ```
+
+> Note: Domeneshop may return an empty response body.  
+> A `finished` fetch status indicates success.
 
 ---
 
-## 5. Run Automatically on DHCP Change (Recommended)
+## 4. Run Automatically on DHCP Change (Recommended)
 
 Attach the script to the WAN DHCP client so it runs:
 - At boot
@@ -128,7 +113,7 @@ This removes the need for a scheduler.
 
 ## Security Notes
 
-- The Base64 credential grants API access — protect the script accordingly
+- The API token grants API access — protect the script accordingly
 - Avoid exporting scripts with credentials
 - Regenerate the API token if the router configuration is shared
 
