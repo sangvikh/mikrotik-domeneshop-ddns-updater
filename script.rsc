@@ -64,18 +64,31 @@
     :local updateUrl \
         "https://api.domeneshop.no/v0/dyndns/update\?hostname=$hostname&myip=$currentIP"
 
+    :local fetchResult
     :local response
+    :local status
+
     :do {
-        :set response ([/tool fetch \
+        :set fetchResult [/tool fetch \
             url=$updateUrl \
             http-header-field=("Authorization: Basic $authBase64") \
-            output=user as-value]->"data")
+            output=user as-value]
+
+        :set status ($fetchResult->"status")
+        :set response ($fetchResult->"data")
     } on-error={
-        :log error "Domeneshop: DNS update failed"
+        :log error "Domeneshop: /tool fetch failed (transport or TLS error)"
+        :log error "Domeneshop: URL = $updateUrl"
         :error "Update failed"
     }
 
-    :log info "Domeneshop: Server response: $response"
+    :log info "Domeneshop: Fetch status = $status"
+    :log info "Domeneshop: Server response = $response"
+
+    :if ($status != "finished") do={
+        :log error "Domeneshop: HTTP request did not complete successfully"
+        :error "Update failed"
+    }
 
 } else={
     :log info "Domeneshop: IP unchanged, no update needed"
