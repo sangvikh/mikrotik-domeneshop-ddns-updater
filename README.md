@@ -33,7 +33,7 @@ The script is designed to run on a main/edge router that receives a public IPv4 
 3. Create a new API token
 4. Save:
    - **Token**
-   - **Secret** (shown only once)
+   - **Secret**
 
 > ⚠️ The API token is **not** your Domeneshop login email, and the secret is **not** your account password.  
 > MFA does not affect API tokens.
