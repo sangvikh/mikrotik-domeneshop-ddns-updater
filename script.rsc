@@ -45,7 +45,6 @@
 
 :set currentIP [/ip dhcp-client get $dhcpId address]
 :set currentIP [:pick $currentIP 0 [:find $currentIP "/"]]
-:set currentIP [:trim $currentIP]
 
 :if ($currentIP = "") do={
     :log error "Domeneshop: WAN IP is empty"
