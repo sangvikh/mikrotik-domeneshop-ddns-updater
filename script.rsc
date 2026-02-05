@@ -62,7 +62,7 @@
 
 :if ($currentIP != $previousIP) do={
 
-    :log info "Domeneshop: IP changed, updating DNS"
+    :log info "Domeneshop: Updating $hostname ($previousIP -> $currentIP)"
 
     :local updateUrl \
         "https://api.domeneshop.no/v0/dyndns/update\?hostname=$hostname&myip=$currentIP"
@@ -86,8 +86,8 @@
         :error "Update failed"
     }
 
-    :log info "Domeneshop: Fetch status = $status"
-    :log info "Domeneshop: Server response = $response"
+    :log info "Domeneshop: Update result for $hostname: status=$status"
+    :log info "Domeneshop: Response for $hostname: $response"
 
     :if ($status != "finished") do={
         :log error "Domeneshop: HTTP request did not complete successfully"
@@ -95,7 +95,7 @@
     }
 
 } else={
-    :log info "Domeneshop: IP unchanged, no update needed"
+    :log info "Domeneshop: $hostname unchanged ($currentIP)"
 }
 
 :log warning "END: Domeneshop DynDNS Update finished"
