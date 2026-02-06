@@ -18,17 +18,18 @@
 :local wanIf "ether1-WAN"
 
 #-------------------------------------------------------------------------------
-
-:local previousIP ""
-:local currentIP ""
+# Resolve current DNS IP
+#-------------------------------------------------------------------------------
 
 :log warning "START: Domeneshop DynDNS Update"
 
 :local waitCount 0
+:local previousIP ""
+
 :while ($waitCount < 15) do={
     :do {
-        :resolve $hostname
-        :log info "Domeneshop: DNS is ready"
+        :set previousIP [:resolve $hostname]
+        :log info "Domeneshop: DNS is ready ($previousIP)"
         :break
     } on-error={
         :delay 1
@@ -36,20 +37,8 @@
     }
 }
 
-:if ($waitCount >= 15) do={
-    :log warning "Domeneshop: DNS not ready after 15s, continuing anyway"
-}
-
-
-#-------------------------------------------------------------------------------
-# Resolve current DNS IP
-#-------------------------------------------------------------------------------
-
-:do {
-    :set previousIP [:resolve $hostname]
-} on-error={
-    :log warning "Domeneshop: Could not resolve $hostname (forcing update)"
-    :set previousIP ""
+:if ($previousIP = "") do={
+    :log warning "Domeneshop: DNS not ready after 15s, forcing update"
 }
 
 #-------------------------------------------------------------------------------
@@ -57,6 +46,7 @@
 #-------------------------------------------------------------------------------
 
 :local dhcpId [/ip dhcp-client find interface=$wanIf]
+:local currentIP ""
 
 :if ([:len $dhcpId] = 0) do={
     :log error "Domeneshop: No DHCP client found on $wanIf"
