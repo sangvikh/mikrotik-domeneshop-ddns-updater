@@ -30,7 +30,7 @@
     :do {
         :set previousIP [:resolve $hostname]
         :log info "Domeneshop: DNS is ready ($previousIP)"
-        :break
+        :set waitCount 255
     } on-error={
         :delay 1
         :set waitCount ($waitCount + 1)
