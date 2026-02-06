@@ -23,7 +23,23 @@
 :local currentIP ""
 
 :log warning "START: Domeneshop DynDNS Update"
-:delay 10
+
+:local waitCount 0
+:while ($waitCount < 15) do={
+    :do {
+        :resolve $hostname
+        :log info "Domeneshop: DNS is ready"
+        :break
+    } on-error={
+        :delay 1
+        :set waitCount ($waitCount + 1)
+    }
+}
+
+:if ($waitCount >= 15) do={
+    :log warning "Domeneshop: DNS not ready after 15s, continuing anyway"
+}
+
 
 #-------------------------------------------------------------------------------
 # Resolve current DNS IP
