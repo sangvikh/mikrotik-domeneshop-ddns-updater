@@ -23,6 +23,7 @@
 :local currentIP ""
 
 :log warning "START: Domeneshop DynDNS Update"
+:delay 10
 
 #-------------------------------------------------------------------------------
 # Resolve current DNS IP
